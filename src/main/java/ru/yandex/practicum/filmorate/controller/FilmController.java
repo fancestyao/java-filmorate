@@ -14,50 +14,56 @@ import java.util.HashMap;
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    public final HashMap<Integer, Film> films = new HashMap<>();
-    private final LocalDate TO_COMPARE = LocalDate.of(1895, Month.DECEMBER, 28);
+    private final HashMap<Integer, Film> films = new HashMap<>();
+    private static final LocalDate DATE_OF_FIRST_FILM = LocalDate.of(1895, Month.DECEMBER, 28);
     private int id = 1;
 
     private int generateId() {
         return id++;
     }
 
-    private boolean isValid(Film film) {
-        if (film.getName().isEmpty() 
-                || film.getDescription().length() > 200 
-                || film.getReleaseDate().isBefore(TO_COMPARE)
-                || film.getDuration() < 0) {
+    private void filmValidation(Film film) {
+        if (film.getName() == null || film.getName().isEmpty()) {
             log.warn("Ошибка валидации фильма.");
-            return false;
-        } else {
-            return true;
+            throw new FilmNotValidException("Ошибка регистрации названия фильма.");
+        } else if (film.getDescription() == null || film.getDescription().length() > 200 ) {
+            log.warn("Ошибка валидации фильма.");
+            throw new FilmNotValidException("Ошибка регистрации описания фильма.");
+        } else if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(DATE_OF_FIRST_FILM)) {
+            log.warn("Ошибка валидации фильма.");
+            throw new FilmNotValidException("Ошибка регистрации даты релиза фильма.");
+        } else if (film.getDuration() < 0) {
+            log.warn("Ошибка валидации фильма.");
+            throw new FilmNotValidException("Ошибка регистрации длительности фильма.");
+        }
+    }
+
+    private void idFilmValidation(Film film) {
+        if (!films.containsKey(film.getId())) {
+            log.warn("Ошибка валидации фильма.");
+            throw new FilmNotValidException("Фильм ранее не был зарегистрирован.");
         }
     }
     
-    @PostMapping()
+    @PostMapping
     public Film addFilm(@RequestBody Film film) {
-        if (isValid(film)) {
-            film.setId(generateId());
-            films.put(film.getId(), film);
-            log.info("Фильм успешно добавлен.");
-        } else {
-            throw new FilmNotValidException();
-        }
+        filmValidation(film);
+        film.setId(generateId());
+        films.put(film.getId(), film);
+        log.info("Фильм успешно добавлен {}.", film);
         return film;
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-        if (films.containsKey(film.getId())) {
-            films.put(film.getId(), film);
-            log.info("Фильм успешно обновлен");
-        } else {
-            throw new FilmNotValidException();
-        }
+        filmValidation(film);
+        idFilmValidation(film);
+        films.put(film.getId(), film);
+        log.info("Фильм успешно обновлен {}.", film);
         return film;
     }
 
-    @GetMapping()
+    @GetMapping
     public ArrayList<Film> getAllFilms() {
         return new ArrayList<>(films.values());
     }

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.FilmController;
@@ -25,6 +26,10 @@ class FilmorateApplicationTests {
 	static void BeforeAll() {
 		userController = new UserController();
 		filmController = new FilmController();
+	}
+
+	@BeforeEach
+	void BeforeEach() {
 		defaultUser = new User(1,
 				"testEmail@test.ru",
 				"testLogin",
@@ -40,167 +45,127 @@ class FilmorateApplicationTests {
 	@Test
 	void shouldCreateUserDefaultBehaviourCase() {
 		Assertions.assertEquals(defaultUser, userController.addUser(defaultUser));
-		Assertions.assertTrue(userController.users.containsValue(defaultUser));
+		Assertions.assertTrue(userController.getAllUsers().contains(defaultUser));
 	}
 
 	@Test
 	void shouldThrowUserNotValidExceptionIfUsersEmailIsEmptyCase() {
-		User userWithEmptyEmail = new User(2,
-				"",
-				"testLogin",
-				"testName",
-				LocalDate.of(1999, 5, 18));
+		defaultUser.setEmail("");
 		Assertions.assertThrows(
 				UserNotValidException.class,
-				() -> userController.addUser(userWithEmptyEmail)
+				() -> userController.addUser(defaultUser)
 		);
 	}
 
 	@Test
 	void shouldThrowUserNotValidExceptionIfUserWithoutAtSymbolInEmailCase() {
-		User userWithoutAtSymbol = new User(2,
-				"testEmailTest.ru",
-				"testLogin",
-				"testName",
-				LocalDate.of(1999, 5, 18));
+		defaultUser.setEmail("testEmailTest.ru");
 		Assertions.assertThrows(
 				UserNotValidException.class,
-				() -> userController.addUser(userWithoutAtSymbol)
+				() -> userController.addUser(defaultUser)
 		);
 	}
 
 	@Test
 	void shouldThrowUserNotValidExceptionIfUsersLoginIsEmptyCase() {
-		User userWithEmptyLogin = new User(2,
-				"test@Emailtest.ru",
-				"",
-				"testName",
-				LocalDate.of(1999, 5, 18));
+		defaultUser.setLogin("");
 		Assertions.assertThrows(
 				UserNotValidException.class,
-				() -> userController.addUser(userWithEmptyLogin)
+				() -> userController.addUser(defaultUser)
 		);
 	}
 
 	@Test
 	void shouldThrowUserNotValidExceptionIfUsersLoginContainsWhiteSpacesCase() {
-		User userWithEmptyLogin = new User(2,
-				"test@Emailtest.ru",
-				"creatively designed login",
-				"testName",
-				LocalDate.of(1999, 5, 18));
+		defaultUser.setLogin("creatively designed login");
 		Assertions.assertThrows(
 				UserNotValidException.class,
-				() -> userController.addUser(userWithEmptyLogin)
+				() -> userController.addUser(defaultUser)
 		);
 	}
 
 	@Test
 	void shouldNotThrowUserNotValidExceptionIfUsersNameIsEmptyCase() {
-		User userWithEmptyLogin = new User(2,
-				"test@Emailtest.ru",
-				"testLogin",
-				"",
-				LocalDate.of(1999, 5, 18));
-		userController.addUser(userWithEmptyLogin);
-		Assertions.assertEquals(userWithEmptyLogin.getName(),
-				userController.users.get(2).getName());
+		defaultUser.setName("");
+		userController.addUser(defaultUser);
+		Assertions.assertEquals(defaultUser.getName(),
+				userController.getAllUsers().get(1).getName());
 	}
 
 	@Test
 	void shouldThrowUserNotValidExceptionIfUsersBirthdayIsInTheFutureCase() {
-		User userIsTerminator = new User(2,
-				"test@Emailtest.ru",
-				"testLogin",
-				"testName",
-				LocalDate.of(2023, 5, 18));
+		defaultUser.setBirthday(LocalDate.of(2023, 5, 18));
 		Assertions.assertThrows(
 				UserNotValidException.class,
-				() -> userController.addUser(userIsTerminator)
+				() -> userController.addUser(defaultUser)
 		);
 	}
 
 	@Test
 	void shouldCreateFilmDefaultBehaviourCase() {
 		Assertions.assertEquals(defaultFilm, filmController.addFilm(defaultFilm));
-		Assertions.assertTrue(filmController.films.containsValue(defaultFilm));
+		Assertions.assertTrue(filmController.getAllFilms().contains(defaultFilm));
 	}
 
 	@Test
 	void shouldThrowFilmNotValidExceptionIfFilmsNameIsEmptyCase() {
-		Film filmWithEmptyName = new Film(2,
-				"",
-				"testDesc",
-				LocalDate.of(1999, 5, 18),
-				120);
+		defaultFilm.setName("");
 		Assertions.assertThrows(
 				FilmNotValidException.class,
-				() -> filmController.addFilm(filmWithEmptyName)
+				() -> filmController.addFilm(defaultFilm)
 		);
 	}
 
 	@Test
 	void shouldThrowFilmNotValidExceptionIfFilmsDescIsLargerThan200SymbolsCase() {
-		Film filmWithHugeDescription = new Film(2,
-				"testName",
-				"&Lorem ipsum dolor sit amet, consectetuer adipiscing elit." +
-						" Aenean commodo ligula eget dolor." +
-						" Aenean massa." +
-						" Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus." +
-						" Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem." +
-						" Nulla consequat massa quis enim." +
-						" Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu." +
-						" In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo." +
-						" Nullam dictum felis eu pede mollis pretium. Integer tincidunt." +
-						" Cras dapibus. Vivamus elementum semper nisi." +
-						" Aenean vulputate eleifend tellus." +
-						" Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim." +
-						" Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus." +
-						" Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum." +
-						" Aenean imperdiet. Etiam ultricies nisi vel augue." +
-						" Curabitur ullamcorper ultricies nisi. Nam eget dui." +
-						" Etiam rhoncus." +
-						" Maecenas tempus, tellus eget condimentum rhoncus," +
-						" sem quam semper libero, sit amet adipiscing sem neque sed ipsum." +
-						" Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem." +
-						" Maecenas nec odio et ante tincidunt tempus." +
-						" Donec vitae sapien ut libero venenatis faucibus." +
-						" Nullam quis ante." +
-						" Etiam sit amet orci eget eros faucibus tincidunt." +
-						" Duis leo. Sed fringilla mauris sit amet nibh." +
-						" Donec sodales sagittis magna." +
-						" Sed consequat, leo eget bibendum sodales, augue velit cursus nunc.",
-				LocalDate.of(1999, 5, 18),
-				120);
+		defaultFilm.setDescription("&Lorem ipsum dolor sit amet, consectetuer adipiscing elit." +
+				" Aenean commodo ligula eget dolor." +
+				" Aenean massa." +
+				" Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus." +
+				" Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem." +
+				" Nulla consequat massa quis enim." +
+				" Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu." +
+				" In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo." +
+				" Nullam dictum felis eu pede mollis pretium. Integer tincidunt." +
+				" Cras dapibus. Vivamus elementum semper nisi." +
+				" Aenean vulputate eleifend tellus." +
+				" Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim." +
+				" Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus." +
+				" Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum." +
+				" Aenean imperdiet. Etiam ultricies nisi vel augue." +
+				" Curabitur ullamcorper ultricies nisi. Nam eget dui." +
+				" Etiam rhoncus." +
+				" Maecenas tempus, tellus eget condimentum rhoncus," +
+				" sem quam semper libero, sit amet adipiscing sem neque sed ipsum." +
+				" Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem." +
+				" Maecenas nec odio et ante tincidunt tempus." +
+				" Donec vitae sapien ut libero venenatis faucibus." +
+				" Nullam quis ante." +
+				" Etiam sit amet orci eget eros faucibus tincidunt." +
+				" Duis leo. Sed fringilla mauris sit amet nibh." +
+				" Donec sodales sagittis magna." +
+				" Sed consequat, leo eget bibendum sodales, augue velit cursus nunc.");
 		Assertions.assertThrows(
 				FilmNotValidException.class,
-				() -> filmController.addFilm(filmWithHugeDescription)
+				() -> filmController.addFilm(defaultFilm)
 		);
 	}
 
 	@Test
 	void shouldThrowFilmNotValidExceptionIfFilmsReleaseDateIsEarlierThan28Dec1895Case() {
-		Film filmIsMadeBC = new Film(2,
-				"testName",
-				"testDesc",
-				LocalDate.of(1895, Month.DECEMBER, 27),
-				120);
+		defaultFilm.setReleaseDate(LocalDate.of(1895, Month.DECEMBER, 27));
 		Assertions.assertThrows(
 				FilmNotValidException.class,
-				() -> filmController.addFilm(filmIsMadeBC)
+				() -> filmController.addFilm(defaultFilm)
 		);
 	}
 
 	@Test
 	void shouldThrowFilmNotValidExceptionIfFilmsDurationIsNegativeCase() {
-		Film filmWithNegativeDuration = new Film(2,
-				"testName",
-				"testDesc",
-				LocalDate.of(2000, Month.DECEMBER, 27),
-				-1);
+		defaultFilm.setDuration(-1);
 		Assertions.assertThrows(
 				FilmNotValidException.class,
-				() -> filmController.addFilm(filmWithNegativeDuration)
+				() -> filmController.addFilm(defaultFilm)
 		);
 	}
 }
