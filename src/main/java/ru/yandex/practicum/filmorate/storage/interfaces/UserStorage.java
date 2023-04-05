@@ -6,7 +6,10 @@ import java.util.Map;
 
 public interface UserStorage {
     User addUser(User user);
+
     User updateUser(User user);
+
     Map<Integer, User> getAllUsers();
-    User getUserById(Integer Id);
+
+    User getUserById(Integer id);
 }
