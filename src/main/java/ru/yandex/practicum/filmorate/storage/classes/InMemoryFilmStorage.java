@@ -57,7 +57,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (film.getName() == null || film.getName().isEmpty()) {
             log.warn("Ошибка валидации фильма.");
             throw new FilmNotValidException("Ошибка регистрации названия фильма.");
-        } else if (film.getDescription() == null || film.getDescription().length() > 200 ) {
+        } else if (film.getDescription() == null || film.getDescription().length() > 200) {
             log.warn("Ошибка валидации фильма.");
             throw new FilmNotValidException("Ошибка регистрации описания фильма.");
         } else if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(DATE_OF_FIRST_FILM)) {
