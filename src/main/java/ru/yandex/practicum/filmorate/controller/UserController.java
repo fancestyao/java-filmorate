@@ -1,78 +1,62 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.FilmNotValidException;
-import ru.yandex.practicum.filmorate.exception.UserNotValidException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.classes.InMemoryUserStorage;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.List;
 
-@Slf4j
 @RestController
+@AllArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private final HashMap<Integer, User> users = new HashMap<>();
-    private int id = 1;
+    private final UserService userService;
+    private final InMemoryUserStorage userStorage;
 
-    private int generateId() {
-        return id++;
-    }
-
-    private void userValidation(User user) {
-        if (user.getEmail() == null
-                || user.getEmail().isEmpty()
-                || !user.getEmail().contains("@")) {
-            log.warn("Ошибка валидации пользователя.");
-            throw new UserNotValidException("Ошибка регистрации почты пользователя.");
-        } else if (user.getLogin() == null
-                || user.getLogin().isEmpty()
-                || user.getLogin().contains(" ")) {
-            log.warn("Ошибка валидации пользователя.");
-            throw new UserNotValidException("Ошибка регистрации логина пользователя.");
-        } else if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
-            log.warn("Ошибка валидации пользователя.");
-            throw new UserNotValidException("Ошибка регистрации даты рождения пользователя.");
-        }
-    }
-
-    private void idUserValidation(User user) {
-        if (!users.containsKey(user.getId())) {
-            log.warn("Ошибка валидации пользователя.");
-            throw new FilmNotValidException("Пользователь ранее не был зарегистрирован.");
-        }
-    }
-
-    private void nameUserValidation(User user) {
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
+    @GetMapping
+    public Collection<User> getUsers() {
+        return userStorage.getAllUsers().values();
     }
 
     @PostMapping
-    public User addUser(@RequestBody User user) {
-        userValidation(user);
-        nameUserValidation(user);
-        user.setId(generateId());
-        users.put(user.getId(), user);
-        log.info("Пользователь успешно добавлен {}.", user);
-        return user;
+    public User createUser(@RequestBody User user) {
+        return userStorage.addUser(user);
     }
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        userValidation(user);
-        idUserValidation(user);
-        nameUserValidation(user);
-        users.put(user.getId(), user);
-        log.info("Пользователь успешно обновлен {}.", user);
-        return user;
+        return userStorage.updateUser(user);
     }
 
-    @GetMapping
-    public ArrayList<User> getAllUsers() {
-        return new ArrayList<>(users.values());
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable Integer id) {
+        return userStorage.getUserById(id);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        userService.removeFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    @ResponseStatus(HttpStatus.OK)
+    public List<User> getAllFriends(@PathVariable Integer id) {
+        return userService.showAllFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getMutualFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
+        return userService.showMutualFriends(id, otherId);
     }
 }
