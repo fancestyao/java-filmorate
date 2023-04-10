@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,7 +18,6 @@ public class UserService {
     private final UserStorage userStorage;
 
     public void addFriend(Integer id, Integer friendId) {
-        notFoundValidation(id, friendId);
         User user1 = userStorage.getUserById(id);
         User user2 = userStorage.getUserById(friendId);
         user1.addFriend(friendId);
@@ -26,7 +26,6 @@ public class UserService {
     }
 
     public void removeFriend(Integer id, Integer friendId) {
-        notFoundValidation(id, friendId);
         User user1 = userStorage.getUserById(id);
         User user2 = userStorage.getUserById(friendId);
         user1.getFriends().remove(friendId);
@@ -52,12 +51,19 @@ public class UserService {
                 .map(userStorage.getAllUsers()::get).collect(Collectors.toList());
     }
 
-    private void notFoundValidation(int id, int friendId) {
-        if (!userStorage.getAllUsers().containsKey(id)) {
-            throw new UserNotFoundException("Пользователя с id" + id + " не существует.");
-        }
-        if (!userStorage.getAllUsers().containsKey(id)) {
-            throw new UserNotFoundException("Пользователя с id" + friendId + " не существует.");
-        }
+    public User addUser(User user) {
+        return userStorage.addUser(user);
+    }
+
+    public User updateUser(User user) {
+        return userStorage.updateUser(user);
+    }
+
+    public User getUserById(Integer id) {
+        return userStorage.getUserById(id);
+    }
+
+    public Map<Integer, User> getAllUsers() {
+        return userStorage.getAllUsers();
     }
 }

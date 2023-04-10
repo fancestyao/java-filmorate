@@ -20,11 +20,13 @@ public class Film {
     private int rate;
     private Set<Integer> likesRate = new HashSet<>();
 
-    public void addLike() {
-        rate++;
+    public void addLike(Integer id) {
+        getLikesRate().add(id);
+        rate = likesRate.size();
     }
 
-    public void removeLike() {
-        rate--;
+    public void removeLike(Integer id) {
+        getLikesRate().remove(id);
+        rate = likesRate.size();
     }
 }

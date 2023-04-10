@@ -15,19 +15,13 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
-    private Set<Integer> friends;
+    private Set<Integer> friends = new HashSet<>();
 
     public void addFriend(Integer id) {
-        if (friends == null) {
-            friends = new HashSet<>();
-        }
         friends.add(id);
     }
 
     public Set<Integer> getFriend() {
-        if (friends == null) {
-            friends = new HashSet<>();
-        }
         return friends;
     }
 }
