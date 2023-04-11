@@ -21,16 +21,39 @@ public class ExceptHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, String>> userNotValidException(final UserNotValidException e) {
+        log.info(e.getMessage());
+        return new ResponseEntity<>(Map
+                .of("Пользователя не удается валидировать", e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, String>> filmNotValidException(final FilmNotValidException e) {
+        log.info(e.getMessage());
+        return new ResponseEntity<>(Map
+                .of("Фильм не удается валидировать", e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     public ResponseEntity<Map<String, String>> userNotFoundException(final UserNotFoundException e) {
         log.info(e.getMessage());
         return new ResponseEntity<>(Map.of("Пользователь не найден", e.getMessage()), HttpStatus.NOT_FOUND);
     }
 
+
     @ExceptionHandler
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     public ResponseEntity<Map<String, String>> filmNotFoundException(final FilmNotFoundException e) {
         log.info(e.getMessage());
         return new ResponseEntity<>(Map.of("Фильм не найден", e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Map<String, String>> serverError(final Throwable e) {
+        log.info(e.getMessage());
+        return new ResponseEntity<>(Map.of("Ошибка сервера", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
