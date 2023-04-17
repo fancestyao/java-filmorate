@@ -21,4 +21,5 @@ Template repository for Filmorate project.
 &emsp; FULL OUTER JOIN films AS f ON f.id = l.film_id <br />
 &emsp; FULL OUTER JOIN users AS u ON u.user_id = l.user_id <br />
 
-[QuickDBD-export (1).pdf](https://github.com/fancestyao/java-filmorate/files/11256512/QuickDBD-export.1.pdf)
+Ниже представлен документ с более развернутой информацией о представленной выше БД. <br />
+[Тот-самый-файл](https://github.com/fancestyao/java-filmorate/files/11256517/CoolQBDpdfVersionFileOfDB.pdf)
