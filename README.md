@@ -20,3 +20,5 @@ Template repository for Filmorate project.
 &emsp; FROM likes AS l <br />
 &emsp; FULL OUTER JOIN films AS f ON f.id = l.film_id <br />
 &emsp; FULL OUTER JOIN users AS u ON u.user_id = l.user_id <br />
+
+[QuickDBD-export (1).pdf](https://github.com/fancestyao/java-filmorate/files/11256512/QuickDBD-export.1.pdf)
