@@ -5,18 +5,18 @@ Template repository for Filmorate project.
 Некоторые примеры sql-запросов к данной БД:
 1) Вывод информации по названию фильма о его жанре и рейтинг (сортировка по рейтингу)
 
-SELECT f.name, g.name, mpa.name
-FROM films AS f
-INNER JOIN film_genre AS fg ON fg.film_id = f.id
-LEFT JOIN genres AS g ON g.genre_id = fg.genre_id
-LEFT JOIN mpa ON mpa_id = f.mpa_id
-GROUP BY f.name, g.name, mpa.name
-ORDER BY mpa.name;
+&emsp; SELECT f.name, g.name, mpa.name <br />
+&emsp; FROM films AS f <br />
+&emsp; INNER JOIN film_genre AS fg ON fg.film_id = f.id <br />
+&emsp; LEFT JOIN genres AS g ON g.genre_id = fg.genre_id <br />
+&emsp; LEFT JOIN mpa ON mpa_id = f.mpa_id <br />
+&emsp; GROUP BY f.name, g.name, mpa.name <br />
+&emsp; ORDER BY mpa.name; <br />
 
 2) Соответствие пользователя и фильма по лайку (вся статистика с null'ами)
 
-SELECT u.name AS user_name,
-       f.name AS film_name
-FROM likes AS l
-FULL OUTER JOIN films AS f ON f.id = l.film_id
-FULL OUTER JOIN users AS u ON u.user_id = l.user_id
+&emsp; SELECT u.name AS user_name, <br />
+&emsp; &emsp; &emsp; &emsp;       f.name AS film_name <br />
+&emsp; FROM likes AS l <br />
+&emsp; FULL OUTER JOIN films AS f ON f.id = l.film_id <br />
+&emsp; FULL OUTER JOIN users AS u ON u.user_id = l.user_id <br />
