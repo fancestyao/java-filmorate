@@ -4,6 +4,7 @@ Template repository for Filmorate project.
 
 Некоторые примеры sql-запросов к данной БД:
 1) Вывод информации по названию фильма о его жанре и рейтинг (сортировка по рейтингу)
+
 SELECT f.name, g.name, mpa.name
 FROM films AS f
 INNER JOIN film_genre AS fg ON fg.film_id = f.id
@@ -13,6 +14,7 @@ GROUP BY f.name, g.name, mpa.name
 ORDER BY mpa.name;
 
 2) Соответствие пользователя и фильма по лайку (вся статистика с null'ами)
+
 SELECT u.name AS user_name,
        f.name AS film_name
 FROM likes AS l
