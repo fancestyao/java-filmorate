@@ -60,14 +60,14 @@ public class ExceptHandler {
 
     @ExceptionHandler
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public ResponseEntity<Map<String, String>> MPANotFoundException(final MPANotFoundException e) {
+    public ResponseEntity<Map<String, String>> mpaNotFoundException(final MPANotFoundException e) {
         log.info(e.getMessage());
         return new ResponseEntity<>(Map.of("Рейтинг не найден.", e.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public ResponseEntity<Map<String, String>> GenreNotFoundException(final GenreNotFoundException e) {
+    public ResponseEntity<Map<String, String>> genreNotFoundException(final GenreNotFoundException e) {
         log.info(e.getMessage());
         return new ResponseEntity<>(Map.of("Жанр не найден.", e.getMessage()), HttpStatus.NOT_FOUND);
     }
