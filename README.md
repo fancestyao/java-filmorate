@@ -1,6 +1,6 @@
 # java-filmorate
 Template repository for Filmorate project.
-![Изображение ER-диаграммы для данного проекта](https://i.gyazo.com/e1c280f635dadee36b9e1544ca8a5718.png)
+![Изображение ER-диаграммы для данного проекта](https://i.gyazo.com/6c2d0aaa042348dbddb638bd3d21299b.png)
 
 Некоторые примеры sql-запросов к данной БД:
 1) Вывод информации по названию фильма о его жанре и рейтинг (сортировка по рейтингу)
