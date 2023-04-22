@@ -18,7 +18,7 @@ import java.util.Map;
 @Primary
 @Service
 @RequiredArgsConstructor
-public class UserDBService implements UserStorage{
+public class UserDBService implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
     private final UserDBStorage userDBStorage;
 
