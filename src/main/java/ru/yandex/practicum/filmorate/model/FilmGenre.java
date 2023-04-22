@@ -11,5 +11,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FilmGenre {
     private int id;
+
     private String name;
 }
