@@ -1,33 +1,33 @@
 package ru.yandex.practicum.filmorate.service.classes;
 
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.UserDBStorage;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
+import ru.yandex.practicum.filmorate.service.interfaces.UserService;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
-@Data
 @Primary
 @Service
+@Slf4j
 @RequiredArgsConstructor
-public class UserDBService implements UserStorage {
-    private final JdbcTemplate jdbcTemplate;
+public class UserDBService implements UserService {
     private final UserDBStorage userDBStorage;
 
     public void addFriend(Integer id, Integer friendId) {
         String sqlQuery = "INSERT INTO FRIENDS(USER_ID, FRIEND_ID)" +
                 "VALUES(?, ?)";
         try {
-            jdbcTemplate.update(sqlQuery, id, friendId);
+            log.info("Добавляем друга.");
+            userDBStorage.jdbcAddFriendUpdate(sqlQuery, id, friendId);
         } catch (DataAccessException e) {
+            log.info("Произошла ошибка добавления.");
             throw new UserNotFoundException("Пользователь не найден.");
         }
     }
@@ -35,12 +35,14 @@ public class UserDBService implements UserStorage {
     public void deleteFriend(Integer id, Integer friendId) {
         String sqlQuery = "DELETE FROM FRIENDS " +
                           "WHERE (USER_ID = ? AND FRIEND_ID = ?) OR (USER_ID = ? AND FRIEND_ID = ?)";
-        jdbcTemplate.update(sqlQuery, id, friendId, friendId, id);
+        userDBStorage.jdbcDeleteFriendUpdate(sqlQuery, id, friendId);
+        log.info("Удаляем друга.");
     }
 
     public List<User> getAllFriends(Integer id) {
         String sqlQuery = "SELECT * FROM USERS WHERE ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)";
-        return jdbcTemplate.query(sqlQuery, userDBStorage::mapRowToUser, id);
+        log.info("Получаем список всех друзей.");
+        return userDBStorage.jdbcGetAllFriends(sqlQuery, id);
     }
 
     public List<User> getMutualFriends(Integer id, Integer otherId) {
@@ -48,25 +50,22 @@ public class UserDBService implements UserStorage {
                           "JOIN FRIENDS AS FR2 ON FR1.FRIEND_ID = FR2.FRIEND_ID AND FR2.USER_ID = ?" +
                           "JOIN USERS AS U ON U.ID = FR1.FRIEND_ID " +
                           "WHERE FR1.USER_ID = ?";
-        return jdbcTemplate.query(sqlQuery, userDBStorage::mapRowToUser, id, otherId);
+        log.info("Получаем список общих друзей.");
+        return userDBStorage.jdbcGetMutualFriends(sqlQuery, id, otherId);
     }
 
-    @Override
     public User addUser(User user) {
         return userDBStorage.addUser(user);
     }
 
-    @Override
     public User updateUser(User user) {
         return userDBStorage.updateUser(user);
     }
 
-    @Override
-    public Map<Integer, User> getAllUsers() {
-        return userDBStorage.getAllUsers();
+    public Collection<User> getAllUsers() {
+        return userDBStorage.getAllUsers().values();
     }
 
-    @Override
     public User getUserById(Integer id) {
         return userDBStorage.getUserById(id);
     }

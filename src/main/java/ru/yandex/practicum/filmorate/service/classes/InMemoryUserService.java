@@ -2,17 +2,20 @@ package ru.yandex.practicum.filmorate.service.classes;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.interfaces.UserService;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
+@Service
 @Slf4j
 @AllArgsConstructor
-public class InMemoryUserService {
+public class InMemoryUserService implements UserService {
     private final UserStorage userStorage;
 
     public void addFriend(Integer id, Integer friendId) {
@@ -23,7 +26,7 @@ public class InMemoryUserService {
         log.info("Пользователь {} и пользователь {} теперь друзья.", user1.getName(), user2.getName());
     }
 
-    public void removeFriend(Integer id, Integer friendId) {
+    public void deleteFriend(Integer id, Integer friendId) {
         User user1 = userStorage.getUserById(id);
         User user2 = userStorage.getUserById(friendId);
         user1.getFriends().remove(friendId);
@@ -31,7 +34,7 @@ public class InMemoryUserService {
         log.info("Пользователь {} и пользователь {} больше не друзья.", user1.getName(), user2.getName());
     }
 
-    public List<User> showMutualFriends(Integer id, Integer friendId) {
+    public List<User> getMutualFriends(Integer id, Integer friendId) {
         log.info("Успешно получен лист общих друзей.");
         return userStorage.getUserById(id).getFriend()
                 .stream()
@@ -40,7 +43,7 @@ public class InMemoryUserService {
                 .collect(Collectors.toList());
     }
 
-    public List<User> showAllFriends(Integer id) {
+    public List<User> getAllFriends(Integer id) {
         if (!userStorage.getAllUsers().containsKey(id)) {
             throw new UserNotFoundException("Пользователя с id" + id + " не существует.");
         }
@@ -61,7 +64,7 @@ public class InMemoryUserService {
         return userStorage.getUserById(id);
     }
 
-    public Map<Integer, User> getAllUsers() {
-        return userStorage.getAllUsers();
+    public Collection<User> getAllUsers() {
+        return userStorage.getAllUsers().values();
     }
 }

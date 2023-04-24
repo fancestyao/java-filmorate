@@ -1,29 +1,29 @@
 package ru.yandex.practicum.filmorate.service.classes;
 
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 import ru.yandex.practicum.filmorate.dao.GenresDBStorage;
 import ru.yandex.practicum.filmorate.model.FilmGenre;
+import ru.yandex.practicum.filmorate.service.interfaces.GenreService;
 
 import java.util.List;
 
-@Data
 @Primary
 @Service
+@Slf4j
 @RequiredArgsConstructor
-public class GenresDBService {
+public class GenresDBService implements GenreService {
     private final GenresDBStorage genresDBStorage;
 
-    @GetMapping
     public List<FilmGenre> getAllGenres() {
+        log.info("Запрос на получение всех жанров в сервисе.");
         return genresDBStorage.getAllGenres();
     }
 
-    @GetMapping("/{id}")
     public FilmGenre getGenreById(Integer id) {
+        log.info("Запрос на получение жанра с id = {} в сервисе.", id);
         return genresDBStorage.getGenreById(id);
     }
 }

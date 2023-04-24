@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.dao;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,18 +13,16 @@ import ru.yandex.practicum.filmorate.model.FilmGenre;
 import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
 @Primary
-@Slf4j
 public class FilmDBStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private static final LocalDate DATE_OF_FIRST_FILM = LocalDate.of(1895, Month.DECEMBER, 28);
@@ -82,6 +79,18 @@ public class FilmDBStorage implements FilmStorage {
         return film;
     }
 
+    public void jdbcAddLike(String sqlQuery, Integer userId, Integer filmId) {
+        jdbcTemplate.update(sqlQuery, filmId, userId);
+    }
+
+    public int jdbcRemoveLike(String sqlQuery, Integer userId, Integer filmId) {
+        return jdbcTemplate.update(sqlQuery, userId, filmId);
+    }
+
+    public List<Film> jdbcShowTopFilms(String sqlQuery, Integer count) {
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
+    }
+
     public Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
                 .id(resultSet.getInt("ID"))
@@ -106,27 +115,26 @@ public class FilmDBStorage implements FilmStorage {
 
     private void setGenresToFilm(Optional<List<FilmGenre>> filmGenres, int filmId) {
         String sqlQuery1 = "DELETE FROM FILM_GENRE WHERE FILM_ID = ?";
+        List<FilmGenre> genresAsList = new ArrayList<>();
+        filmGenres.ifPresent(genresAsList::addAll);
         jdbcTemplate.update(sqlQuery1, filmId);
         if (filmGenres.isPresent() && !filmGenres.get().isEmpty()) {
-            for (FilmGenre genre : filmGenres.get()) {
-                String sqlQuery2 = "MERGE INTO FILM_GENRE (GENRE_ID, FILM_ID) KEY (GENRE_ID, FILM_ID) VALUES (?, ?)";
-                jdbcTemplate.update(sqlQuery2, genre.getId(), filmId);
-            }
+            String sqlQuery2 = "MERGE INTO FILM_GENRE (GENRE_ID, FILM_ID) KEY (GENRE_ID, FILM_ID) VALUES (?, ?)";
+            jdbcTemplate.batchUpdate(sqlQuery2, genresAsList, 6, (PreparedStatement ps, FilmGenre fg) -> {
+                ps.setInt(1, fg.getId());
+                ps.setInt(2, filmId);
+            });
         }
     }
 
     private void filmValidation(Film film) {
         if (film.getName() == null || film.getName().isEmpty()) {
-            log.warn("Ошибка валидации фильма.");
             throw new FilmNotValidException("Ошибка регистрации названия фильма.");
         } else if (film.getDescription() == null || film.getDescription().length() > 200) {
-            log.warn("Ошибка валидации фильма.");
             throw new FilmNotValidException("Ошибка регистрации описания фильма.");
         } else if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(DATE_OF_FIRST_FILM)) {
-            log.warn("Ошибка валидации фильма.");
             throw new FilmNotValidException("Ошибка регистрации даты релиза фильма.");
         } else if (film.getDuration() < 0) {
-            log.warn("Ошибка валидации фильма.");
             throw new FilmNotValidException("Ошибка регистрации длительности фильма.");
         }
     }

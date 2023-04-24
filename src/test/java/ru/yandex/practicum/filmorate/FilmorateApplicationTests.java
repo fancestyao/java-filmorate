@@ -9,5 +9,4 @@ import org.springframework.boot.test.context.SpringBootTest;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmorateApplicationTests {
-
 }

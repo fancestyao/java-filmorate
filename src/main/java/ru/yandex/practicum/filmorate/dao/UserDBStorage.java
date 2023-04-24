@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.dao;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,9 +25,8 @@ import java.util.Objects;
 @Repository
 @RequiredArgsConstructor
 @Primary
-@Slf4j
 public class UserDBStorage implements UserStorage {
-    private final JdbcTemplate jdbcTemplate;
+    public final JdbcTemplate jdbcTemplate;
 
     @Override
     public User addUser(User user) {
@@ -85,6 +83,22 @@ public class UserDBStorage implements UserStorage {
         return user;
     }
 
+    public void jdbcAddFriendUpdate(String sqlQuery, Integer id, Integer friendId) {
+        jdbcTemplate.update(sqlQuery, id, friendId);
+    }
+
+    public void jdbcDeleteFriendUpdate(String sqlQuery, Integer id, Integer friendId) {
+        jdbcTemplate.update(sqlQuery, id, friendId, friendId, id);
+    }
+
+    public List<User> jdbcGetMutualFriends(String sqlQuery, Integer id, Integer otherId) {
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser, id, otherId);
+    }
+
+    public List<User> jdbcGetAllFriends(String sqlQuery, Integer id) {
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser, id);
+    }
+
     public User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
                 .id(resultSet.getInt("ID"))
@@ -105,15 +119,12 @@ public class UserDBStorage implements UserStorage {
         if (user.getEmail() == null
                 || user.getEmail().isEmpty()
                 || !user.getEmail().contains("@")) {
-            log.warn("Ошибка валидации пользователя.");
             throw new UserNotValidException("Ошибка регистрации почты пользователя.");
         } else if (user.getLogin() == null
                 || user.getLogin().isEmpty()
                 || user.getLogin().contains(" ")) {
-            log.warn("Ошибка валидации пользователя.");
             throw new UserNotValidException("Ошибка регистрации логина пользователя.");
         } else if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
-            log.warn("Ошибка валидации пользователя.");
             throw new UserNotValidException("Ошибка регистрации даты рождения пользователя.");
         }
     }
