@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.classes;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.comparator.RateComparator;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.interfaces.FilmService;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class FilmService {
+public class InMemoryFilmService implements FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
@@ -43,7 +44,7 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-    public ArrayList<Film> getAllFilms() {
+    public List<Film> getAllFilms() {
         return filmStorage.getAllFilms();
     }
 

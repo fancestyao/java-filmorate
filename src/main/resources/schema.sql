@@ -1,0 +1,68 @@
+CREATE TABLE IF NOT EXISTS Genre (
+	genre_id INTEGER NOT NULL,
+	genre_name CHARACTER VARYING(255) NOT NULL,
+	CONSTRAINT "genre_pk" PRIMARY KEY (genre_id)
+);
+
+MERGE INTO Genre (genre_id, genre_name)
+VALUES (1, 'Комедия'),
+       (2, 'Драма'),
+       (3, 'Мультфильм'),
+       (4, 'Триллер'),
+       (5, 'Документальный'),
+       (6, 'Боевик');
+
+CREATE TABLE IF NOT EXISTS MPA (
+	mpa_id INTEGER NOT NULL,
+	mpa_name CHARACTER VARYING(255) NOT NULL,
+	CONSTRAINT "MPA_pk" PRIMARY KEY (mpa_id)
+);
+
+MERGE INTO MPA (mpa_id, mpa_name)
+VALUES (1, 'G'),
+       (2, 'PG'),
+       (3, 'PG-13'),
+       (4, 'R'),
+       (5, 'NC-17');
+
+CREATE TABLE IF NOT EXISTS Film (
+	id INTEGER NOT NULL AUTO_INCREMENT,
+	name CHARACTER VARYING(255) NOT NULL,
+	description CHARACTER VARYING(255) NOT NULL,
+	release_date DATE NOT NULL,
+	duration INTEGER NOT NULL,
+	mpa_id INTEGER NOT NULL,
+	CONSTRAINT "film_pk" PRIMARY KEY (id),
+	CONSTRAINT "film_fk_mpa" FOREIGN KEY (mpa_id) REFERENCES MPA(mpa_id) ON DELETE RESTRICT ON UPDATE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS Film_genre (
+     genre_id INTEGER,
+     film_id INTEGER NOT NULL,
+     CONSTRAINT "genre_fk" FOREIGN KEY (genre_id) REFERENCES Genre(genre_id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+     CONSTRAINT "film_fk" FOREIGN KEY (film_id) REFERENCES Film(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS Users (
+	id INTEGER NOT NULL AUTO_INCREMENT,
+	email CHARACTER VARYING(255) NOT NULL,
+	login CHARACTER VARYING(255) NOT NULL,
+	name CHARACTER VARYING(255),
+	birthday DATE NOT NULL,
+	CONSTRAINT "user_pk" PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS Likes (
+	user_id INTEGER,
+	film_id INTEGER,
+	CONSTRAINT "likes_fk_film" FOREIGN KEY (film_id) REFERENCES Film(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+	CONSTRAINT "likes_fk_user" FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS Friends (
+	user_id INTEGER,
+	friend_id INTEGER,
+	STATUS BOOLEAN,
+	CONSTRAINT "friends_fk_friend" FOREIGN KEY (friend_id) REFERENCES Users(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+	CONSTRAINT "friends_fk_user" FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+);

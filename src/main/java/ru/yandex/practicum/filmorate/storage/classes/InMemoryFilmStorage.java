@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -48,7 +49,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public ArrayList<Film> getAllFilms() {
+    public List<Film> getAllFilms() {
         log.info("Успешно получен список всех фильмов.");
         return new ArrayList<>(films.values());
     }
