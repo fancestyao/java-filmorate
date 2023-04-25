@@ -41,7 +41,7 @@ public class FilmDBService implements FilmService {
                           "FROM FILM AS F " +
                           "LEFT JOIN LIKES AS L ON F.ID = L.FILM_ID " +
                           "LEFT JOIN MPA AS M ON F.MPA_ID = M.MPA_ID " +
-                          "GROUP BY F.NAME " +
+                          "GROUP BY F.NAME, F.ID " +
                           "ORDER BY COUNT(L.USER_ID) DESC " +
                           "LIMIT ?";
         log.info("Успешно получен список лучших фильмов.");
